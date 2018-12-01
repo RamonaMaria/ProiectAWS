@@ -12,7 +12,7 @@ class App extends Component {
             medicamentIsChecked: false,
             allergyIsChecked: false,
             listSelect: [], // o sa am o lista pt medicamente si una pt alergii (pt select si afisat)
-            list: [],
+            list: [], // list pt afisat
             selectedValue: '',
             placeholderSelect: 'Select allergy / medicament',
             numberElem: 0,
@@ -75,7 +75,7 @@ class App extends Component {
                    };
         this.setState({roButton : event.target.value,
                        enButton: false,
-                       list:  getMedicaments}); //Object.values(post("translatedLabels", obj)).map(i => i[1])});
+                       list:  Object.values(post("translatedLabels", obj)).map(i => i[1])});
     }
 
     handleEnButtonChange (event) {
