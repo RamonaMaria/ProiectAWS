@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import {getMedicaments, getAllergies} from "./data/DataUtils";
+import {getMedicaments, getAllergies, getJson, post} from "./data/DataUtils";
 import Select from 'react-select';
 
 
@@ -11,12 +11,14 @@ class App extends Component {
         this.state = {
             medicamentIsChecked: false,
             allergyIsChecked: false,
-            list: [], // o sa am o lista pt medicamente si una pt alergii (pt select si afisat)
+            listSelect: [], // o sa am o lista pt medicamente si una pt alergii (pt select si afisat)
+            list: [],
             selectedValue: '',
-            placeholderSelect: 'Selevt allergy / medicament',
+            placeholderSelect: 'Select allergy / medicament',
             numberElem: 0,
             roButton: false,
-            enButton: false
+            enButton: false,
+            jsonAllergies: {}
 
 
         };
@@ -35,11 +37,10 @@ class App extends Component {
        console.log("Medicament", event.target.value);
        this.setState({medicamentIsChecked: event.target.value,
                            allergyIsChecked: false,
-                           list: getAllergies(),
+                           listSelect: Object.values(getJson("/allergies")),
                            selectedValue: '',
                            placeholderSelect: 'Select allergy'});
-        // TODO  post request de unde aduci lista de alergii -
-        // ai o lista generala pe care o updatezi fie cu medicamente fie cu alergii - ce sa se puna in select
+
    }
 
 
@@ -48,18 +49,16 @@ class App extends Component {
        console.log("Allergy", event.target.value);
        this.setState({allergyIsChecked: event.target.value,
                      medicamentIsChecked: false,
-                     list: getMedicaments(),
+                     listSelect: getMedicaments(),
                      selectedValue: '',
                      placeholderSelect: 'Select medicament'});
-        // TODO post request de unde aduci lista de medicamnete - ce sa se puna in select
+
    }
 
 
     handleSelectChange (value) {
        console.log("select::::: ", value);
        this.setState({selectedValue : value});
-
-       // TODO post request unde trimiti la server medicamentul sau alergia selectat / selectata - ce sa se afiseze
 
     }
 
@@ -70,17 +69,33 @@ class App extends Component {
 
     handleRoButtonChange(event) {
         console.log("roButton::::: ", event.target.value);
+         var obj = {
+                     "allergy": this.state.allergyIsChecked,
+                     "medicament": this.state.medicamentIsChecked
+                   };
         this.setState({roButton : event.target.value,
-                       enButton: false});
+                       enButton: false,
+                       list:  Object.values(post("translatedLabels", obj)).map(i => i[1])});
     }
 
     handleEnButtonChange (event) {
-        console.log("enButton::::: ", event.target.value);
+//        console.log("enButton::::: ", event.target.value);
+//        console.log("1::::: ", this.state.allergyIsChecked);
+//        console.log("2::::: ", this.state.medicamentIsChecked);
+
+           var obj = {
+                     "allergy": this.state.allergyIsChecked,
+                     "medicament": this.state.medicamentIsChecked
+                   };
         this.setState({enButton : event.target.value,
-                       roButton: false});
+                       roButton: false,
+                       list:  Object.values(post("translatedLabels", obj)).map(i => i[0])});
     }
 
     render() {
+        var flag =  {"id1": ['numeEngleza', 'numeRomana'], "id2": ['numeEngleza', 'numeRomana']};
+        console.log("flag", Object.values(flag).map(i => i[1]));
+
         var listItems;
         const size = this.state.numberElem;
         if(size > this.state.list.length){
@@ -129,7 +144,7 @@ class App extends Component {
          </div>
          <Select
               onChange={this.handleSelectChange}
-              options={this.state.list.map(sensor => ({label: sensor}))}
+             // options={this.state.list.map(data => ({label: data}))}
               placeholder={this.state.placeholderSelect}
               value={this.state.selectedValue}
          />
