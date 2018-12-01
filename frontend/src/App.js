@@ -75,7 +75,7 @@ class App extends Component {
                    };
         this.setState({roButton : event.target.value,
                        enButton: false,
-                       list:  Object.values(post("translatedLabels", obj)).map(i => i[1])});
+                       list:  getMedicaments}); //Object.values(post("translatedLabels", obj)).map(i => i[1])});
     }
 
     handleEnButtonChange (event) {
@@ -144,7 +144,7 @@ class App extends Component {
          </div>
          <Select
               onChange={this.handleSelectChange}
-             // options={this.state.list.map(data => ({label: data}))}
+              options={this.state.listSelect.map(data => ({label: data}))}
               placeholder={this.state.placeholderSelect}
               value={this.state.selectedValue}
          />
